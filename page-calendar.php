@@ -5,7 +5,7 @@
 		<section class="calendar-wrapper">
 
 			<section class="calendar-header">
-				<!-- <div class="left">
+				<div class="left">
 					<ul>
 						<li>
 							<a href="<?php echo get_site_url(null, '/', 'http'); ?>">
@@ -54,7 +54,7 @@
 							</a>
 						</li>
 					</ul>
-				</div> -->
+				</div>
 				<div class="center">
 					<ul>
 						<li><button><</button></li>
