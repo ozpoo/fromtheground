@@ -1,2 +1,2 @@
-# ftg
+# FTG
 Repository for FTG — From the Ground
