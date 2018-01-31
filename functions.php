@@ -256,22 +256,37 @@ add_action( 'pre_get_posts', 'wpsites_query' );
 function my_acf_admin_head() {
 	?>
 	<style type="text/css">
-    .acf-fields > .acf-field.half{
+  /* Custom columns */
+    .acf-fields > .acf-field.half {
       width: 50%;
       box-sizing: border-box;
       float: left;
       clear: none;
     }
-
-    .acf-fields > .acf-field.third{
+    .acf-fields > .acf-field.third {
       width: 33.33%;
       box-sizing: border-box;
       float: left;
       clear: none;
     }
-
-    .acf-fields > .acf-field.no-top-border{
+    .acf-fields > .acf-field.no-top-border {
       border-top: none;
+    }
+
+    /* Remove labels */
+    .acf-field-5a7145e127fda label, .acf-field-5a71461227fdb label, .acf-field-5a713c8d5ffbb label {
+      display: none!important;
+    }
+
+    /* wysiwyg styles */
+    .wp-editor-container textarea.wp-editor-area {
+      height: 100px !important;
+    }
+    .acf-field .acf-editor-wrap iframe {
+      width: 100%;
+    }
+    .acf-editor-wrap .wp-editor-container {
+      margin-top: 0px;
     }
 	</style>
 	<?php
@@ -288,5 +303,46 @@ function my_orderby_filter($orderby, &$query){
  }
 
 add_filter("posts_orderby", "my_orderby_filter", 10, 2);
+
+// Remove ACF inline styles for WYSIWYG
+function my_acf_input_admin_footer() { ?>
+	<script type="text/javascript">
+		(function($) {
+			acf.add_action('wysiwyg_tinymce_init', function( ed, id, mceInit, $field ){
+				$(".acf-field .acf-editor-wrap iframe").removeAttr("style");
+			});
+		})(jQuery);
+	</script>
+<?php }
+add_action('acf/input/admin_footer', 'my_acf_input_admin_footer');
+
+function my_toolbars( $toolbars ) {
+	// Add a new toolbar called "Very Simple"
+	$toolbars['Very Simple' ] = array();
+	$toolbars['Very Simple' ][1] = array('bold', 'italic', 'underline', 'removeformat');
+
+	// Edit the "Full" toolbar and remove 'code'
+	// if( ($key = array_search('code' , $toolbars['Full' ][2])) !== false ) {
+	//     unset( $toolbars['Full' ][2][$key] );
+	// }
+
+	// remove the 'Basic' toolbar completely
+	// unset( $toolbars['Basic' ] );
+
+	return $toolbars;
+}
+
+add_filter("acf/fields/wysiwyg/toolbars", "my_toolbars"  );
+
+// Auto set programming title to date
+function modify_post_title( $data ) {
+  if($data['post_type'] == 'programming') {
+    $title = get_field('date', $data['ID']);
+    $data['post_title'] =  $title ;
+  }
+  return $data;
+}
+add_filter( 'wp_insert_post_data' , 'modify_post_title' , '99', 1 );
+
 
 ?>
