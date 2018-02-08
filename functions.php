@@ -246,6 +246,7 @@ remove_action('wp_head', 'wp_shortlink_wp_head', 10, 0);
 
 remove_filter ('the_excerpt', 'wpautop');
 
+// Display all posts for specified types
 function wpsites_query( $query ) {
   if ( (is_post_type_archive("movements") || is_post_type_archive("workouts") ) && $query->is_main_query() && !is_admin() ) {
     $query->set( 'posts_per_page', -1 );
@@ -253,6 +254,7 @@ function wpsites_query( $query ) {
 }
 add_action( 'pre_get_posts', 'wpsites_query' );
 
+// Custom styling for ACF backend UI
 function my_acf_admin_head() {
 	?>
 	<style type="text/css">
@@ -291,9 +293,9 @@ function my_acf_admin_head() {
 	</style>
 	<?php
 }
-
 add_action('acf/input/admin_head', 'my_acf_admin_head');
 
+// List posts in alphabetical order in backend
 function my_orderby_filter($orderby, &$query){
     global $wpdb;
     if (get_query_var("post_type") == "movements" || get_query_var("post_type") == "workouts") {
@@ -301,7 +303,6 @@ function my_orderby_filter($orderby, &$query){
     }
     return $orderby;
  }
-
 add_filter("posts_orderby", "my_orderby_filter", 10, 2);
 
 // Remove ACF inline styles for WYSIWYG
@@ -316,6 +317,7 @@ function my_acf_input_admin_footer() { ?>
 <?php }
 add_action('acf/input/admin_footer', 'my_acf_input_admin_footer');
 
+// Simplify the ACF WYSIWYG toolbar
 function my_toolbars( $toolbars ) {
 	// Add a new toolbar called "Very Simple"
 	$toolbars['Very Simple' ] = array();
@@ -331,18 +333,29 @@ function my_toolbars( $toolbars ) {
 
 	return $toolbars;
 }
-
 add_filter("acf/fields/wysiwyg/toolbars", "my_toolbars"  );
 
-// Auto set programming title to date
-function modify_post_title( $data ) {
-  if($data['post_type'] == 'programming') {
-    $title = get_field('date', $data['ID']);
-    $data['post_title'] =  $title ;
-  }
-  return $data;
+// Auto set post type programming title to date
+function set_programming_title ($post_id) {
+    if ( $post_id == null || empty($_POST) )
+        return;
+
+    if ( !isset( $_POST['post_type'] ) || $_POST['post_type']!='programming' )
+        return;
+
+    if ( wp_is_post_revision( $post_id ) )
+        $post_id = wp_is_post_revision( $post_id );
+
+    global $post;
+    if ( empty( $post ) )
+        $post = get_post($post_id);
+
+    global $wpdb;
+    $title = get_field('date', $post_id);
+    $where = array( 'ID' => $post_id );
+    $wpdb->update( $wpdb->posts, array( 'post_title' => $title ), $where );
 }
-add_filter( 'wp_insert_post_data' , 'modify_post_title' , '99', 1 );
+add_action('save_post', 'set_programming_title', 12 );
 
 
 ?>
