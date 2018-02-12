@@ -143,17 +143,18 @@
 					<?php $days_in_this_week++; ?>
 				<?php endfor; ?>
 
-				<?php
-					$post = $posts[$current];
-					setup_postdata($post);
-				?>
-
 				<!-- Days this month -->
 				<?php for($day = 1; $day <= $days_in_month; $day++): ?>
 					<?php
-						$date = get_field("date");
-						$date = DateTime::createFromFormat('m/d/Y', $date);
-						$date = $date->format('d');
+						$post = $posts[$current];
+						if($post) {
+							setup_postdata($post);
+							$date = get_field("date");
+							$date = DateTime::createFromFormat('m/d/Y', $date);
+							$date = $date->format('d');
+						} else {
+							$date = null;
+						}
 					?>
 						<div class="calendar-day" data-date="<?php echo $day; ?>" data-x="<?php echo $dx++; ?>">
 							<div class="content">
@@ -167,58 +168,32 @@
 									<?php while($date == $day): ?>
 										<?php
 										$title = $movement = $description = $notes = null;
-										if( have_rows('workout_type') ):
-									    while ( have_rows('workout_type') ) : the_row();
-								        if( get_row_layout() == 'custom' ):
-													$title = get_sub_field('title');
-													$description = get_sub_field('description');
-													$notes = get_sub_field('notes');
-								        elseif( get_row_layout() == 'benchmark' ):
-													$title = get_the_title(get_sub_field('workout'));
-													$notes = get_sub_field('notes');
-												elseif( get_row_layout() == 'movement' ):
-													$title = get_sub_field('title');
-													$movement = get_the_title(get_sub_field('movement'));
-													$description = get_sub_field('description');
-													$notes = get_sub_field('notes');
-								        endif;
-									    endwhile;
-										endif;
+										// $title = get_sub_field('title');
+										$notes = get_sub_field('notes');
 										?>
-										<p>
-											<?php if($title): ?>
-												<strong><?php echo $title; ?></strong>
-											<?php endif; ?>
-											<?php if($movement): ?>
-												<?php if($title): ?><br><?php endif; ?>
-												<?php if(!$title): ?><strong><?php endif; ?>
-												<?php echo $movement; ?>
-												<?php if(!$title): ?></strong><?php endif; ?>
-											<?php endif; ?>
-											<?php if($description): ?>
-												<br><?php echo $description; ?>
-											<?php endif; ?>
-											<?php if($notes): ?>
-												<br><small><?php echo $notes; ?></small>
-											<?php endif; ?>
-										</p>
+										<?php the_content(); ?>
+										<p><small><?php echo $notes; ?></small></p>
 										<?php
 											wp_reset_postdata();
 											$current++;
 											$post = $posts[$current];
-											setup_postdata($post);
-											$date = get_field("date");
-											$date = DateTime::createFromFormat('m/d/Y', $date);
-											$date = $date->format('d');
+											if($post) {
+												setup_postdata($post);
+												$date = get_field("date");
+												$date = DateTime::createFromFormat('m/d/Y', $date);
+												$date = $date->format('d');
+											} else {
+												$date = null;
+											}
 										?>
 									<?php endwhile; ?>
 								</div>
-								<!-- <p>
+								<p>
 									<small>
 										Lorem ipsum dolor sit amet, homero necessitatibus mei id, mea quas errem at, vis an mutat regione denique. Facer voluptua ex sea, ne eum discere expetendis. Vel an legere minimum pertinax, no amet erant saepe vix. Per te consul debitis fastidii, ei vix ullum causae, vim primis accusam disputando no. Epicurei persecuti ei vis, no quo tantas recteque.
 									</small>
 								</p>
-								<p><button class="button"><small>Edit</small></button></p> -->
+								<p><button class="button"><small>Edit</small></button></p>
 						</div>
 					</div>
 					<?php if($running_day == 6): ?>
