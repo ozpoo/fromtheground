@@ -158,42 +158,61 @@
 					?>
 						<div class="calendar-day" data-date="<?php echo $day; ?>" data-x="<?php echo $dx++; ?>">
 							<div class="content">
-								<div class="number">
-									<p><?php echo $day; ?></p>
+								<div class="scroll">
+									<div class="number">
+										<p><?php echo $day; ?></p>
+									</div>
+									<div class="list">
+										<?php while($date == $day): ?>
+											<?php
+											$title = $movement = $description = $notes = null;
+											// $title = get_sub_field('title');
+											$notes = get_sub_field('notes');
+											?>
+											<?php the_content(); ?>
+											<?php if($notes): ?>
+												<p><small><?php echo $notes; ?></small></p>
+											<?php endif; ?>
+											<?php
+												wp_reset_postdata();
+												$current++;
+												$post = $posts[$current];
+												if($post) {
+													setup_postdata($post);
+													$date = get_field("date");
+													$date = DateTime::createFromFormat('m/d/Y', $date);
+													$date = $date->format('d');
+												} else {
+													$date = null;
+												}
+											?>
+										<?php endwhile; ?>
+									</div>
 								</div>
 								<div class="day">
-									<p><small><?php echo $days[$day%7]; ?></small></p>
+									<p><small><?php echo $days[$day%7]; ?> &mdash; <?php echo $day; ?></small></p>
 								</div>
-								<div class="list">
-									<?php while($date == $day): ?>
-										<?php
-										$title = $movement = $description = $notes = null;
-										// $title = get_sub_field('title');
-										$notes = get_sub_field('notes');
-										?>
-										<?php the_content(); ?>
-										<p><small><?php echo $notes; ?></small></p>
-										<?php
-											wp_reset_postdata();
-											$current++;
-											$post = $posts[$current];
-											if($post) {
-												setup_postdata($post);
-												$date = get_field("date");
-												$date = DateTime::createFromFormat('m/d/Y', $date);
-												$date = $date->format('d');
-											} else {
-												$date = null;
-											}
-										?>
-									<?php endwhile; ?>
+								<div class="add">
+									<p>
+										<button class="spin">
+											<svg version="1.1"
+												 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+												 x="0px" y="0px" width="30px" height="30px" viewBox="0 0 30 30" style="enable-background:new 0 0 30 30;" xml:space="preserve">
+
+											<g>
+												<path d="M15,2c7.2,0,13,5.8,13,13s-5.8,13-13,13S2,22.2,2,15S7.8,2,15,2 M15,0C6.7,0,0,6.7,0,15s6.7,15,15,15s15-6.7,15-15
+													S23.3,0,15,0L15,0z"/>
+											</g>
+											<g>
+												<line class="st1" x1="7.5" y1="15" x2="22.5" y2="15"/>
+											</g>
+											<g>
+												<line class="st1" x1="15" y1="7.5" x2="15" y2="22.5"/>
+											</g>
+											</svg>
+										 </button>
+									</p>
 								</div>
-								<p>
-									<small>
-										Lorem ipsum dolor sit amet, homero necessitatibus mei id, mea quas errem at, vis an mutat regione denique. Facer voluptua ex sea, ne eum discere expetendis. Vel an legere minimum pertinax, no amet erant saepe vix. Per te consul debitis fastidii, ei vix ullum causae, vim primis accusam disputando no. Epicurei persecuti ei vis, no quo tantas recteque.
-									</small>
-								</p>
-								<p><button class="button"><small>Edit</small></button></p>
 						</div>
 					</div>
 					<?php if($running_day == 6): ?>

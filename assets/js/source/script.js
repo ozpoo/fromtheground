@@ -78,7 +78,7 @@
 
 		function setCurrentDay(index) {
 			// Set position
-			var day = $(".calendar-day").eq(index);
+			var day = $(".calendar-day[data-date="+index+"]");
 			var width = 420;
 			var height = 600;
 			var dx = $(day).data("x");
