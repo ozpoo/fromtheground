@@ -3,36 +3,48 @@ const uglify = require("gulp-uglify");
 const jshint = require("gulp-jshint");
 const sass = require('gulp-sass');
 const sassLint = require('gulp-sass-lint');
-const cleanCSS = require('gulp-clean-css');
+const minifyCss = require("gulp-minify-css");
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const cssdeclsort = require('css-declaration-sorter');
 const concat = require("gulp-concat");
+const stylish = require('jshint-stylish');
+
+var watchJS = true;
+var watchSCSS = true;
 
 gulp.task('js', function () {
-	gulp.src('assets/js/source/script.js')
-	.pipe(jshint())
-	.pipe(jshint.reporter('fail'))
-	.pipe(concat('script.js'))
-	.pipe(uglify())
-	.pipe(gulp.dest('assets/js/build'));
+	if(watchJS) {
+		watchJS = false;
+		gulp.src('assets/js/src/*')
+		.pipe(jshint())
+		.pipe(jshint.reporter(stylish))
+		.pipe(concat('build.js'))
+		.pipe(uglify())
+		.pipe(gulp.dest('assets/js/build'));
+		watchJS = true;
+	}
 });
 
 gulp.task('scss', function () {
-  gulp.src('assets/css/source/style.scss')
-	.pipe(sassLint())
-  .pipe(sassLint.format())
-  .pipe(sassLint.failOnError())
-	.pipe(postcss([ cssdeclsort({order: 'smacss'}) ]))
-	.pipe(gulp.dest('assets/css/source'))
-	.pipe(sass().on('error', sass.logError))
-  .pipe(postcss([ autoprefixer() ]))
-  .pipe(concat('style.css'))
-	.pipe(cleanCSS({compatibility: 'ie8'}))
-  .pipe(gulp.dest('assets/css/build'));
+	if(watchSCSS) {
+		watchSCSS = false;
+	  gulp.src('assets/css/src/*')
+		.pipe(sassLint())
+	  .pipe(sassLint.format())
+	  .pipe(sassLint.failOnError())
+		.pipe(postcss([ cssdeclsort({order: 'smacss'}) ]))
+		.pipe(gulp.dest('./'))
+		.pipe(sass().on('error', sass.logError))
+	  .pipe(postcss([ autoprefixer() ]))
+	  .pipe(concat('build.css'))
+		.pipe(minifyCss())
+	  .pipe(gulp.dest('assets/css/build'));
+		watchSCSS = true;
+	}
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['assets/css/source/style.scss'], ['scss']);
-	gulp.watch(['assets/js/source/script.js'], ['js']);
+  gulp.watch(['assets/css/src/*'], ['scss']);
+	gulp.watch(['assets/js/src/*'], ['js']);
 });
